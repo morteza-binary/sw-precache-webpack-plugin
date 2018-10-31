@@ -116,7 +116,7 @@ class SWPrecacheWebpackPlugin {
 
     if (outputPath) {
       // strip the webpack config's output.path (replace for windows users)
-      stripPrefixMulti[`${outputPath}${path.sep}`.replace(/\\/g, '/')] = publicPath;
+      stripPrefixMulti[`${outputPath}${path.sep}`.replace(/\\/g, '/')] = this.getPublicPath(publicPath);
     }
 
     this.config = {
@@ -129,7 +129,7 @@ class SWPrecacheWebpackPlugin {
     this.overrides.filepath = filepath;
 
     // resolve [hash] used in importScripts
-    this.configureImportScripts(importScripts, publicPath, compiler, compilation);
+    this.configureImportScripts(importScripts, this.getPublicPath(publicPath), compiler, compilation);
 
     if (mergeStaticsConfig) {
       // merge generated and user provided options
@@ -239,6 +239,14 @@ class SWPrecacheWebpackPlugin {
     if (this.workerOptions.debug) {
       this.warnings.forEach(warning => compilation.warnings.push(warning));
     }
+  }
+
+  getPublicPath(publicPath) {
+    if (typeof publicPath === 'function') {
+      return publicPath();
+    }
+
+    return publicPath;
   }
 }
 
